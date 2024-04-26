@@ -20,15 +20,14 @@ public class SpringSecurityConfig {
 	private UserDetailsService userDetailsService;
 
 	@Bean
-	public static PasswordEncoder passwordEncoder() {
+	static PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	@SuppressWarnings("removal")
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-		http.csrf().disable().authorizeHttpRequests((authorize) -> {
+		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests((authorize) -> {
 			authorize.requestMatchers("/api/auth/**").permitAll();
 			authorize.anyRequest().authenticated();
 		});
@@ -36,7 +35,7 @@ public class SpringSecurityConfig {
 	}
 
 	@Bean
-	public AuthenticationManager authentication(AuthenticationConfiguration configuration) throws Exception {
+	AuthenticationManager authentication(AuthenticationConfiguration configuration) throws Exception {
 		return configuration.getAuthenticationManager();
 	}
 }
