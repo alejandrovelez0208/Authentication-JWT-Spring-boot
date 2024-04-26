@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.jwt.entity.User;
 import com.example.jwt.entity.dto.JWTAuthResponse;
 import com.example.jwt.entity.dto.LoginDto;
 import com.example.jwt.service.AuthService;
@@ -28,4 +29,10 @@ public class AuthController {
 
 		return ResponseEntity.ok(jwtAuthResponse);
 	}
+
+	@PostMapping(value = "/register")
+	public ResponseEntity<Boolean> register(@RequestBody User user) {
+		return ResponseEntity.ok(authService.register(user));
+	}
+
 }
