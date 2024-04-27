@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
 	public AuthResponse register(RegisterRequest request) {
 		try {
 			Optional<User> userExists = userRepository.findByUserNameOrEmail(request.getUserName(), request.getEmail());
-			if (userExists != null) {
+			if (userExists != null && !userExists.isEmpty()) {
 				log.error("Error...There's already a register user with that email");
 				throw new RuntimeException();
 			}
