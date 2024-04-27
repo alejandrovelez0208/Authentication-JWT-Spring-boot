@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.jwt.entity.User;
 import com.example.jwt.entity.dto.AuthResponse;
 import com.example.jwt.entity.dto.LoginDto;
+import com.example.jwt.entity.dto.RegisterRequest;
 import com.example.jwt.service.AuthService;
 
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class AuthController {
 	}
 
 	@PostMapping(value = "/register")
-	public ResponseEntity<Boolean> register(@RequestBody User user) {
+	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest user) {
 		return ResponseEntity.ok(authService.register(user));
 	}
 

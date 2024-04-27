@@ -4,12 +4,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.jwt.entity.User;
 import com.example.jwt.entity.dto.AuthResponse;
 import com.example.jwt.entity.dto.LoginDto;
+import com.example.jwt.entity.dto.RegisterRequest;
 import com.example.jwt.jwt.JwtTokenProvider;
 import com.example.jwt.repository.UserRepository;
 import com.example.jwt.service.AuthService;
@@ -41,25 +43,27 @@ public class AuthServiceImpl implements AuthService {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginDto.getUserNameOrEmail(), loginDto.getPassword()));
 
+		UserDetails user = userRepository.findByUserName(loginDto.getUserNameOrEmail()).orElseThrow();
+		
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-		String token = jwtTokenProvider.generateToken(authentication);
+		String token = jwtTokenProvider.getToken(user);
 
 		return AuthResponse.builder().token(token).build();
 	}
 
 	@Override
-	public Boolean register(User user) {
-		Boolean ok = false;
+	public AuthResponse register(RegisterRequest request) {
 		try {
-			User newUser = User.builder().userName(user.getName()).name(user.getUserName()).email(user.getEmail())
-					.password(passwordEncoder.encode(user.getPassword())).roles(null).build();
+			User user = User.builder().userName(request.getName()).name(request.getUserName()).email(request.getEmail())
+					.password(passwordEncoder.encode(request.getPassword())).build();
 
-			userRepository.save(newUser);
-			ok = true;
+			userRepository.save(user);
+
+			return AuthResponse.builder().token(jwtTokenProvider.getToken(user)).build();
 		} catch (Exception e) {
 			log.error("Error en el metodo [Register]");
 		}
-		return ok;
+		return null;
 	}
 }
