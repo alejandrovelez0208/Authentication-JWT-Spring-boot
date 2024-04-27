@@ -21,10 +21,8 @@ public class AuthServiceImpl implements AuthService {
 
 	private AuthenticationManager authenticationManager;
 
-	@SuppressWarnings("unused")
 	private UserRepository userRepository;
 
-	@SuppressWarnings("unused")
 	private PasswordEncoder passwordEncoder;
 
 	private JwtTokenProvider jwtTokenProvider;

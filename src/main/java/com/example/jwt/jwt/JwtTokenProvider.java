@@ -1,6 +1,5 @@
 package com.example.jwt.jwt;
 
-import java.security.Key;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
@@ -45,19 +44,19 @@ public class JwtTokenProvider {
 		return token;
 	}
 
-	public Key key() {
+	public SecretKey key() {
 		return Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(jwtSecret));
 	}
 
 	public String getUserName(String token) {
-		Jws<Claims> claims = Jwts.parser().verifyWith((SecretKey) key()).build().parseSignedClaims(token);
+		Jws<Claims> claims = Jwts.parser().verifyWith(key()).build().parseSignedClaims(token);
 		String userName = claims.getPayload().getSubject();
 		return userName;
 	}
 
 	public Boolean validateToken(String token) {
 		try {
-			Jwts.parser().verifyWith((SecretKey) key()).build().parse(token);
+			Jwts.parser().verifyWith(key()).build().parse(token);
 			return true;
 		} catch (MalformedJwtException e) {
 			logger.error("Invalid JWT token: {}", e.getMessage());
