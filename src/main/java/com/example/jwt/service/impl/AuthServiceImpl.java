@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.jwt.entity.User;
+import com.example.jwt.entity.dto.AuthResponse;
 import com.example.jwt.entity.dto.LoginDto;
 import com.example.jwt.jwt.JwtTokenProvider;
 import com.example.jwt.repository.UserRepository;
@@ -36,7 +37,7 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public String login(LoginDto loginDto) {
+	public AuthResponse login(LoginDto loginDto) {
 		Authentication authentication = authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(loginDto.getUserNameOrEmail(), loginDto.getPassword()));
 
@@ -44,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
 
 		String token = jwtTokenProvider.generateToken(authentication);
 
-		return token;
+		return AuthResponse.builder().token(token).build();
 	}
 
 	@Override

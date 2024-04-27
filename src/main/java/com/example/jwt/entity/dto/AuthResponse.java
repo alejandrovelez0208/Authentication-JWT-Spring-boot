@@ -1,16 +1,17 @@
 package com.example.jwt.entity.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class JWTAuthResponse {
+public class AuthResponse {
 
-	private String accessToken;
-	private String tokenType = "Bearer";
+	private String token;
 }
