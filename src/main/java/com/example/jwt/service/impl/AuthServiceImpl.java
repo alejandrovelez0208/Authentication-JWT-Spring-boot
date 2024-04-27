@@ -1,5 +1,8 @@
 package com.example.jwt.service.impl;
 
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -8,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.jwt.entity.Role;
 import com.example.jwt.entity.User;
 import com.example.jwt.entity.dto.AuthResponse;
 import com.example.jwt.entity.dto.LoginDto;
@@ -30,6 +34,8 @@ public class AuthServiceImpl implements AuthService {
 
 	private JwtTokenProvider jwtTokenProvider;
 
+	private UserServiceImpl userServiceImpl;
+
 	public AuthServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository,
 			PasswordEncoder passwordEncoder, JwtTokenProvider jwtTokenProvider) {
 		this.authenticationManager = authenticationManager;
@@ -44,7 +50,7 @@ public class AuthServiceImpl implements AuthService {
 				new UsernamePasswordAuthenticationToken(loginDto.getUserNameOrEmail(), loginDto.getPassword()));
 
 		UserDetails user = userRepository.findByUserName(loginDto.getUserNameOrEmail()).orElseThrow();
-		
+
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		String token = jwtTokenProvider.getToken(user);
@@ -55,10 +61,19 @@ public class AuthServiceImpl implements AuthService {
 	@Override
 	public AuthResponse register(RegisterRequest request) {
 		try {
-			User user = User.builder().userName(request.getName()).name(request.getUserName()).email(request.getEmail())
-					.password(passwordEncoder.encode(request.getPassword())).build();
+			Optional<User> userExists = userRepository.findByUserNameOrEmail(request.getUserName(), request.getEmail());
+			if (userExists != null) {
+				log.error("Error...There's already a register user with that email");
+				throw new RuntimeException();
+			}
+
+			User user = User.builder().name(request.getName()).userName(request.getUserName()).email(request.getEmail())
+					.password(passwordEncoder.encode(request.getPassword())).roles(Set.of(new Role(request.getRole())))
+					.build();
 
 			userRepository.save(user);
+
+			userServiceImpl.assignRoleToUser(request.getEmail(), "ADMIN");
 
 			return AuthResponse.builder().token(jwtTokenProvider.getToken(user)).build();
 		} catch (Exception e) {

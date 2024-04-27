@@ -51,6 +51,12 @@ public class User implements UserDetails {
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Set<Role> roles;
+	
+	
+	public void assignRoleToUser(Role role) {
+		this.roles.add(role);
+		role.getUsers().add(this);
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
