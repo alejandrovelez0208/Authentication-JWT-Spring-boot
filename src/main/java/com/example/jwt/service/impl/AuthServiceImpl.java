@@ -1,8 +1,8 @@
 package com.example.jwt.service.impl;
 
 import java.util.Optional;
-import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,7 +11,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.example.jwt.entity.Role;
 import com.example.jwt.entity.User;
 import com.example.jwt.entity.dto.AuthResponse;
 import com.example.jwt.entity.dto.LoginDto;
@@ -34,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
 
 	private JwtTokenProvider jwtTokenProvider;
 
+	@Autowired
 	private UserServiceImpl userServiceImpl;
 
 	public AuthServiceImpl(AuthenticationManager authenticationManager, UserRepository userRepository,
@@ -68,12 +68,11 @@ public class AuthServiceImpl implements AuthService {
 			}
 
 			User user = User.builder().name(request.getName()).userName(request.getUserName()).email(request.getEmail())
-					.password(passwordEncoder.encode(request.getPassword())).roles(Set.of(new Role(request.getRole())))
-					.build();
+					.password(passwordEncoder.encode(request.getPassword())).build();
 
 			userRepository.save(user);
 
-			userServiceImpl.assignRoleToUser(request.getEmail(), "ADMIN");
+			userServiceImpl.assignRoleToUser(request.getEmail(), "STUDENT");
 
 			return AuthResponse.builder().token(jwtTokenProvider.getToken(user)).build();
 		} catch (Exception e) {

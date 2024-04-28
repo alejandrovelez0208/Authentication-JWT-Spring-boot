@@ -1,6 +1,8 @@
 package com.example.jwt.entity;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,9 +53,11 @@ public class User implements UserDetails {
 	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
 	private Set<Role> roles;
-	
-	
+
 	public void assignRoleToUser(Role role) {
+		if (roles == null) {
+			roles = new HashSet<>();
+		}
 		this.roles.add(role);
 		role.getUsers().add(this);
 	}
@@ -87,4 +91,28 @@ public class User implements UserDetails {
 	public boolean isEnabled() {
 		return false;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		return Objects.equals(email, other.email) && Objects.equals(name, other.name)
+				&& Objects.equals(password, other.password) && Objects.equals(userName, other.userName);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(email, name, password, userName);
+	}
+
+	@Override
+	public String toString() {
+		return "User [name=" + name + ", userName=" + userName + ", email=" + email + ", password=" + password + "]";
+	}
+
 }
